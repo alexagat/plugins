@@ -402,6 +402,16 @@
 }
 
 - (bool)loadUrl:(NSString*)url withHeaders:(NSDictionary<NSString*, NSString*>*)headers {
+  if ([url.lowercaseString hasPrefix:@"file://"]) {
+    url = [url substringFromIndex:7]; // length of 'file://'
+
+    NSURL *nsUrl = [NSURL fileURLWithPath:url];
+    NSURL *readAccessToURL = [[nsUrl URLByDeletingLastPathComponent] URLByDeletingLastPathComponent];
+
+    [_webView loadFileURL:nsUrl allowingReadAccessToURL:readAccessToURL];
+    return true;
+  } 
+
   NSURL* nsUrl = [NSURL URLWithString:url];
   if (!nsUrl) {
     return false;
